@@ -206,10 +206,7 @@ class Polyedr:
         tk.clean()
         self.edges_uniq()
         for e in self.edges:
-            for f in self.facets:
-                e.shadow(f)
-            for s in e.gaps:
-                if e.is_not_inside_circle(e.r3(0).rz(
+             if e.is_not_inside_circle(e.r3(0).rz(
                -self.alpha).ry(-self.beta).rz(-self.gamma) * (1/self.c)) and \
                   e.is_not_inside_circle(e.r3(0.5).rz(
                -self.alpha).ry(-self.beta).rz(-self.gamma) * (1/self.c)) and \
@@ -218,5 +215,9 @@ class Polyedr:
                     self.sum += sqrt((e.r3(1).x - e.r3(0).x)**2 +
                                      (e.r3(1).y - e.r3(0).y)**2 +
                                      (e.r3(1).z - e.r3(0).z)**2)
+            for f in self.facets:
+                e.shadow(f)
+            for s in e.gaps:
+               
                 tk.draw_line(e.r3(s.beg), e.r3(s.fin))
         print(f"the sum is {self.sum/self.c}")
