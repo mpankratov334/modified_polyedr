@@ -10,7 +10,7 @@ def length(poly):
         for f in poly.facets:
             e.shadow(f)
         if not e.gaps and not e.is_in_default_square(poly.c):
-            angle = e.h_angle()
+            angle = e.h_angle(poly.alpha, poly.beta, poly.gamma)
             if angle <= DEFAULT_ANGLE:
                 sqx = (e.fin.x - e.beg.x) ** 2
                 sqy = (e.fin.y - e.beg.y) ** 2
@@ -63,3 +63,12 @@ class TestModification:
         file = os.path.join(os.path.dirname(current_directory), "data", "test5.geom")
         poly = Polyedr(file)
         assert length(poly) == approx(0)
+
+    # Ребро закрыто плоскостью её центр лежит вне квадрата
+    # угол с горизонтальной плоскостью равен нулю и
+    # есть поворот плоскости
+    def test6(self):
+        current_directory = os.getcwd()
+        file = os.path.join(os.path.dirname(current_directory), "data", "test6.geom")
+        poly = Polyedr(file)
+        assert length(poly) == approx(5)
