@@ -171,9 +171,6 @@ class Polyedr:
                     x, y, z = (float(x) for x in line.split())
                     self.vertexes.append(R3(x, y, z).rz(
                         alpha).ry(beta).rz(gamma) * self.c)
-                    if i == 6:
-                        print(self.vertexes[-1].x)
-
                 else:
                     # вспомогательный массив
                     buf = line.split()
