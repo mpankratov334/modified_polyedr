@@ -3,7 +3,7 @@ from functools import reduce
 from operator import add
 from common.r3 import R3
 from common.tk_drawer import TkDrawer
-from math import acos, sqrt, pi
+from math import atan, sqrt, pi
 
 
 DEFAULT_ANGLE = pi/7
@@ -85,18 +85,11 @@ class Edge:
         return Segment(Edge.SBEG, x) if f0 < 0.0 else Segment(x, Edge.SFIN)
 
     # Угол между ребром и горизонтальной плоскостью
-    def h_angle(self):
-        vector = R3(
-            self.fin.x - self.beg.x,
-            self.fin.y - self.beg.y,
-            self.fin.z - self.beg.z
-        )
-        # Координаты проекции: {vector.x, vector.y, 0}
-        sqx = vector.x ** 2
-        sqy = vector.y ** 2
-        sqz = vector.z ** 2
-        cos = (sqx + sqy)/(sqrt(sqx + sqy + sqz) * sqrt(sqx + sqy))
-        return acos(cos)
+    def h_angle(self, a, b, g):
+        x1, y1, z1 = self.beg.x, self.beg.y, self.beg.z
+        x2, y2, z2 = self.fin.x, self.fin.y, self.fin.z
+        tg = abs(z1-z2)/sqrt((x1-x2)**2 + (y1 - y2) ** 2)
+        return atan(tg)
 
     def is_in_default_square(self, c):
         vector = R3(
@@ -160,7 +153,6 @@ class Polyedr:
         # списки вершин, рёбер и граней полиэдра
         self.vertexes, self.edges, self.facets = [], [], []
         file = file.replace(r'\\', '\\')
-        print(file)
         # список строк файла
         with open(file) as f:
             for i, line in enumerate(f):
@@ -179,6 +171,9 @@ class Polyedr:
                     x, y, z = (float(x) for x in line.split())
                     self.vertexes.append(R3(x, y, z).rz(
                         alpha).ry(beta).rz(gamma) * self.c)
+                    if i == 6:
+                        print(self.vertexes[-1].x)
+
                 else:
                     # вспомогательный массив
                     buf = line.split()
@@ -191,6 +186,7 @@ class Polyedr:
                         self.edges.append(Edge(vertexes[n - 1], vertexes[n]))
                     # задание самой грани
                     self.facets.append(Facet(vertexes))
+            self.alpha, self.beta, self.gamma = alpha, beta, gamma
 
     # Метод изображения полиэдра
     def draw(self, tk):
@@ -200,7 +196,7 @@ class Polyedr:
             for f in self.facets:
                 e.shadow(f)
             if len(e.gaps) == 0 and not e.is_in_default_square(self.c):
-                angle = e.h_angle()
+                angle = e.h_angle(self.alpha, self.beta, self.gamma)
                 if angle <= DEFAULT_ANGLE:
                     sqx = (e.fin.x - e.beg.x) ** 2
                     sqy = (e.fin.y - e.beg.y) ** 2
