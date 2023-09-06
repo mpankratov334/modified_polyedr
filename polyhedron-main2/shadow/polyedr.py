@@ -1,4 +1,3 @@
-from math import pi
 from functools import reduce
 from operator import add
 from common.r3 import R3
